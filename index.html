@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para Evelyn ❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1a050d 0%, #050505 100%);
+            overflow: hidden; font-family: 'Quicksand', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Fondo de estrellas animadas */
+        #star-field { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            animation: moveStar var(--duration) linear infinite; opacity: var(--opacity);
+        }
+        @keyframes moveStar {
+            from { transform: translateY(110vh); }
+            to { transform: translateY(-10vh); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 50px 30px;
+            text-align: center;
+            width: 90%; max-width: 450px;
+            position: relative; z-index: 10;
+            box-shadow: 0 0 40px rgba(255, 45, 85, 0.2);
+        }
+
+        .anahi-name {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(to right, #ff2d55, #fb7185);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Corazón con latido inmersivo */
+        .heart-main {
+            font-size: 80px; color: #ff2d55;
+            text-shadow: 0 0 20px rgba(255, 45, 85, 0.8);
+            animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+            display: inline-block; margin-bottom: 20px;
+        }
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
+        }
+
+        #noBtn {
+            background-color: #1e293b; color: white;
+            border: 2px solid #ef4444; border-radius: 9999px;
+            padding: 12px 30px; font-weight: bold;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.2s ease; z-index: 100;
+        }
+
+        #yesBtn {
+            background-color: white; color: black; font-weight: bold;
+            padding: 12px 40px; border-radius: 9999px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .heart-float {
+            position: absolute; pointer-events: none;
+            animation: floatUp 4s ease-in forwards; z-index: 5;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-500px) scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="star-field"></div>
+
+    <div class="glass-card" id="card">
+        <div id="content">
+            <div class="heart-main">❤️</div>
+            <h2 class="text-xs uppercase tracking-[0.4em] text-pink-300 mb-2">Una pregunta para mi</h2>
+            <h1 class="text-6xl anahi-name mb-8">AMOR</h1>
+            <p id="mainText" class="text-gray-200 text-lg mb-12 italic leading-relaxed">
+                "No creo en las casualidades, pero sí en las mejores decisiones. Y mi decisión favorita siempre serás tú."
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-8" id="btnArea" style="min-height: 60px; position: relative;">
+                <button id="yesBtn" onclick="accept()">SÍ, ACEPTO ❤️</button>
+                <button id="noBtn" onmouseover="moveNo()" ontouchstart="moveNo(event)">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crear campo de estrellas inmersivo
+        const starField = document.getElementById('star-field');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.width = star.style.height = Math.random() * 3 + 'px';
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            star.style.setProperty('--opacity', Math.random());
+            starField.appendChild(star);
+        }
+
+        const noBtn = document.getElementById('noBtn');
+        const card = document.getElementById('card');
+        const messages = [
+            "¿eVELYN, segura? ✨", "Piénsalo un poquito... 🥺", "Mi corazón late por ti ❤️", 
+            "¿Y si somos equipo? 👫", "Prometo cuidarte siempre 🌹", "Me harías tan feliz... ✨",
+            "Eres mi pensamiento favorito 💭", "No me rompas el corazón... 💔", "Te debo mil besos ☕", "¡Dime que sí, Evelyn! ⭐"
+        ];
+        let msgIndex = 0;
+
+        function moveNo(e) {
+            if(e) e.preventDefault();
+            const cardRect = card.getBoundingClientRect();
+            // Restringir el movimiento para que no se salga de la tarjeta
+            const maxX = cardRect.width - noBtn.offsetWidth - 20;
+            const maxY = cardRect.height - noBtn.offsetHeight - 20;
+
+            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            
+            noBtn.innerText = messages[msgIndex];
+            msgIndex = (msgIndex + 1) % messages.length;
+        }
+
+        function accept() {
+            // Lluvia de confeti
+            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }, colors: ['#ff2d55', '#ffffff', '#fb7185'] });
+            
+            // Cambiar fondo a modo amor total
+            document.body.style.background = "radial-gradient(circle at center, #4c0519 0%, #050505 100%)";
+            
+            // Crear lluvia de corazones
+            setInterval(() => {
+                const h = document.createElement('div');
+                h.innerHTML = '❤️';
+                h.className = 'heart-float';
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.bottom = '-20px';
+                h.style.fontSize = Math.random() * 20 + 20 + 'px';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 4000);
+            }, 150);
+
+            document.getElementById('content').innerHTML = `
+                <div class="heart-main">💖</div>
+                <h1 class="text-5xl anahi-name mb-6">¡Gracias, AMOR!</h1>
+                <p class="text-white text-2xl mb-4">Me has hecho la persona más feliz.💖</p>
+                <p class="text-pink-400 text-lg italic mt-4">Prepárate para el mejor 14 de febrero de tu vida. ❤️</p>
+            `;
+        }
+    </script>
+</body>
+</html>
